@@ -69,8 +69,14 @@ export default function PlacementsPage() {
           </p>
         </div>
         <div style={{ display: "flex", gap: 10 }}>
-          <button onClick={load} className="eas-btn">
-            ↻ Refresh
+          <button
+            onClick={load}
+            className={`eas-btn${loading ? " eas-btn-loading" : ""}`}
+            disabled={loading}
+            aria-label="Refresh placements"
+          >
+            <span style={{ display: "inline-block", transition: "transform 0.5s cubic-bezier(0.4,0,0.2,1)", transform: loading ? "rotate(360deg)" : "rotate(0deg)" }}>↻</span>
+            {loading ? " Loading..." : " Refresh"}
           </button>
           <Link href="/leaderboard" className="eas-btn eas-btn-primary">
             Leaderboard
@@ -218,6 +224,7 @@ export default function PlacementsPage() {
                     }}
                   >
                     <div
+                      className="eas-progress-bar"
                       style={{
                         height: "100%",
                         width: `${pct}%`,
@@ -228,7 +235,7 @@ export default function PlacementsPage() {
                             : pct >= 40
                             ? "var(--gold)"
                             : "var(--purple)",
-                        transition: "width .3s ease",
+                        transition: "width 0.6s cubic-bezier(0.4,0,0.2,1)",
                       }}
                     />
                   </div>
