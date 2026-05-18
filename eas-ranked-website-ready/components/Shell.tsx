@@ -123,7 +123,7 @@ export default function Shell({
           <button onClick={() => setOpen(true)} className="eas-btn eas-mobile-menu">☰</button>
           <div>
             <div className="eas-top-kicker">Elevate All-Stars</div>
-            <div className="eas-top-title">TimeBomb Duels Ranked</div>
+            <div className="eas-top-title">EAS Ranked</div>
           </div>
           <div style={{ display: "flex", gap: 10 }}>
             {user && <Link className="eas-btn" href={`/profile/${user.id}`}>Profile</Link>}

@@ -3,7 +3,7 @@ import ToastProvider from "@/components/ToastProvider";
 
 export const metadata = {
   title: "EAS Arena Ranked",
-  description: "Elevate All-Stars TimeBomb Duels Ranked Dashboard",
+  description: "EAS Ranked league dashboard for Elevate All-Stars.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
