@@ -6,8 +6,9 @@ This directory contains Discord bot cogs for EAS Arena.
 
 | Cog | File | Purpose |
 |-----|------|---------|
-| Giveaway Codes | `cogs/giveaway_codes.py` | Owner-only slash commands for managing Premium giveaway codes |
-| Premium Sync   | `cogs/premium_sync.py`   | Auto-syncs Buy Me a Coffee premium role to the website database |
+| Giveaway Codes  | `cogs/giveaway_codes.py`  | Owner-only slash commands for managing Premium giveaway codes |
+| Premium Sync    | `cogs/premium_sync.py`    | Auto-syncs Buy Me a Coffee premium role to the website database |
+| Ranked Commands | `cogs/ranked_commands.py` | Scrim/ranked/placement result entry and rollback with review countdowns |
 
 ---
 
@@ -19,7 +20,7 @@ This directory contains Discord bot cogs for EAS Arena.
 pip install discord.py aiohttp
 ```
 
-### 2. Load both cogs in your bot
+### 2. Load all cogs in your bot
 
 ```python
 # In your main bot file (e.g. bot.py)
@@ -27,6 +28,7 @@ async def main():
     bot = commands.Bot(command_prefix="!", intents=discord.Intents.all())
     await bot.load_extension("cogs.giveaway_codes")
     await bot.load_extension("cogs.premium_sync")
+    await bot.load_extension("cogs.ranked_commands")
     await bot.start(os.getenv("DISCORD_BOT_TOKEN"))
 ```
 
@@ -140,3 +142,133 @@ Premium badge visible to everyone within ~30 seconds
 ## Owner Check
 
 Only users whose Discord ID is in `OWNER_USER_IDS` (or the hardcoded developer ID `733871667788644445`) can run owner commands. All other users receive an "Access Denied" message.
+
+---
+
+## Ranked Commands
+
+All commands are owner-only and use the `!` prefix.  Every stat-changing command shows a **review embed with a countdown** before applying changes, preventing accidental entries.
+
+### Result Entry Commands
+
+#### `!scrimresult <winner_id> <loser_id> <winner_kills> <loser_kills> [cr_change=25]`
+
+Enter a scrim result.  Shows a **10-second countdown** review embed before applying.
+
+| Parameter      | Description                                      | Example              |
+|----------------|--------------------------------------------------|----------------------|
+| `winner_id`    | Discord user ID of the winner                    | `123456789012345678` |
+| `loser_id`     | Discord user ID of the loser                     | `987654321098765432` |
+| `winner_kills` | Number of kills the winner got                   | `8`                  |
+| `loser_kills`  | Number of kills the loser got                    | `3`                  |
+| `cr_change`    | CR to add/remove (default: 25)                   | `30`                 |
+
+**What it changes:**
+- Winner: +CR, +1 win, +kills, +1 match
+- Loser: -CR (floor 0), +1 loss, +kills, +1 match
+
+**Example:**
+```
+!scrimresult 123456789012345678 987654321098765432 8 3
+!scrimresult 123456789012345678 987654321098765432 8 3 30
+```
+
+---
+
+#### `!rankedresult <winner_id> <loser_id> <winner_kills> <loser_kills> [cr_change=30]`
+
+Enter a ranked match result.  Shows a **10-second countdown** review embed before applying.
+
+Same parameters as `!scrimresult` but defaults to 30 CR change.
+
+**Example:**
+```
+!rankedresult 123456789012345678 987654321098765432 10 4
+```
+
+---
+
+#### `!placementresult <player_id> <kills> <placement> [cr_grant=100]`
+
+Enter a placement match result for a single player.  Shows a **10-second countdown** review embed before applying.
+
+| Parameter    | Description                                      | Example              |
+|--------------|--------------------------------------------------|----------------------|
+| `player_id`  | Discord user ID of the player                    | `123456789012345678` |
+| `kills`      | Number of kills the player got                   | `5`                  |
+| `placement`  | Final placement position (e.g. 1 = 1st place)   | `3`                  |
+| `cr_grant`   | CR to award (default: 100)                       | `150`                |
+
+**What it changes:**
+- Player: +CR, +kills, +1 placement_match, +1 match
+
+**Example:**
+```
+!placementresult 123456789012345678 5 3
+!placementresult 123456789012345678 5 3 150
+```
+
+---
+
+### Rollback Commands
+
+#### `!scrimrollback <player_id>`
+
+Roll back the most-recent scrim result for a **single player**.  Shows a **20-second countdown** review embed before applying.
+
+1. Bot asks whether the player was the **Winner** or **Loser** (button select).
+2. Bot shows a review embed with the exact stat changes that will be reversed.
+3. Confirm button unlocks after 20 seconds.
+4. Removes **all** stats added by that result: CR, win/loss, match count.
+
+> **Note:** Kill counts are not rolled back in single-player rollback because
+> per-match kill history is not stored.  Use `!teamrollback` to roll back kills
+> for both players simultaneously.
+
+**Example:**
+```
+!scrimrollback 123456789012345678
+```
+
+---
+
+#### `!teamrollback <winner_id> <loser_id> [cr_change=25]`
+
+Roll back the most-recent scrim result for **both players** simultaneously.  Shows a **20-second countdown** review embed before applying.
+
+1. Bot prompts for kill counts to remove (reply with `<winner_kills> <loser_kills>`).
+2. Bot shows a review embed with all stat changes for both players.
+3. Confirm button unlocks after 20 seconds.
+4. Removes **all** stats: CR, kills, win/loss, match count.
+
+**Example:**
+```
+!teamrollback 123456789012345678 987654321098765432
+!teamrollback 123456789012345678 987654321098765432 30
+```
+
+---
+
+### Review Embed Flow
+
+Every result/rollback command follows this flow:
+
+```
+Operator runs command
+        |
+        v
+Bot fetches current player stats from database
+        |
+        v
+Review embed sent — shows BEFORE and AFTER stats
+Confirm button DISABLED for N seconds (10 for results, 20 for rollbacks)
+Countdown updates every second in the embed footer
+        |
+        v
+Countdown expires → Confirm button ENABLED
+        |
+        v
+Operator clicks Confirm → stats applied to database
+Operator clicks Cancel  → action cancelled, no changes made
+No click within 5s      → timeout, action cancelled
+```
