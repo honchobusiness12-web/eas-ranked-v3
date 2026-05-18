@@ -5,9 +5,10 @@ This directory contains Discord bot cogs for EAS Arena.
 ## Cogs
 
 | Cog | File | Purpose |
-|-----|------|---------|
+|-----|------|---------| 
 | Giveaway Codes | `cogs/giveaway_codes.py` | Owner-only slash commands for managing Premium giveaway codes |
 | Premium Sync   | `cogs/premium_sync.py`   | Auto-syncs Buy Me a Coffee premium role to the website database |
+| Ranked Tools   | `cogs/ranked_tools.py`   | Owner-only kill management commands and public `!commands` listing |
 
 ---
 
@@ -19,7 +20,7 @@ This directory contains Discord bot cogs for EAS Arena.
 pip install discord.py aiohttp
 ```
 
-### 2. Load both cogs in your bot
+### 2. Load all cogs in your bot
 
 ```python
 # In your main bot file (e.g. bot.py)
@@ -27,6 +28,7 @@ async def main():
     bot = commands.Bot(command_prefix="!", intents=discord.Intents.all())
     await bot.load_extension("cogs.giveaway_codes")
     await bot.load_extension("cogs.premium_sync")
+    await bot.load_extension("cogs.ranked_tools")
     await bot.start(os.getenv("DISCORD_BOT_TOKEN"))
 ```
 
@@ -136,6 +138,65 @@ revalidatePath() refreshes /profile/:id, /leaderboard, /
          v
 Premium badge visible to everyone within ~30 seconds
 ```
+
+---
+
+## Ranked Tools Commands
+
+### `!addkills @user <kills>`
+
+Add kills to a player's total kill count retroactively. Use this when a league host forgot to log kills for a ranked or placement game.
+
+| Parameter | Description                                  | Example       |
+|-----------|----------------------------------------------|---------------|
+| `@user`   | The player to credit kills to                | `@JohnDoe`    |
+| `kills`   | Number of kills to add (1–1000)              | `5`           |
+
+**What it does:**
+1. Fetches the player's current kill total from the database
+2. Adds the specified kills to their total
+3. Writes a history entry: `[YYYY-MM-DD] +N kills added by <admin> (retroactive — missed kill log)`
+4. Updates the database via the player-update webhook
+
+**Example:**
+```
+!addkills @JohnDoe 5
+```
+
+---
+
+### `!scrimrollback @user1 @user2 ... <kills>`
+
+Remove kills from multiple players at once to undo a scrim result that was entered backwards (winners/losers swapped). Simpler than the snapshot-based rollback — just decrements kills and writes a history entry.
+
+| Parameter  | Description                                         | Example              |
+|------------|-----------------------------------------------------|----------------------|
+| `@user...` | One or more players to remove kills from            | `@Alice @Bob @Carol` |
+| `kills`    | Number of kills to remove from each player (1–1000) | `3`                  |
+
+**What it does:**
+1. Fetches each player's current kill total
+2. Subtracts the specified kills (floors at 0 — kills cannot go negative)
+3. Writes a history entry per player: `[YYYY-MM-DD] -N kills removed by <admin> (scrim rollback — result entered backwards)`
+4. Reports a per-player success/failure summary
+
+**Example:**
+```
+!scrimrollback @Alice @Bob @Carol 3
+```
+
+---
+
+### `!commands`
+
+List all available bot commands with descriptions, organised by permission level. Available to everyone.
+
+**Example:**
+```
+!commands
+```
+
+---
 
 ## Owner Check
 
