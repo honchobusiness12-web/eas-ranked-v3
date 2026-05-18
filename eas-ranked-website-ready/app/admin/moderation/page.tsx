@@ -1,0 +1,5 @@
+import Shell from "@/components/ServerShell";
+import { getSession } from "@/lib/auth";
+import { isOwnerIdentity } from "@/lib/admin";
+import Link from "next/link";
+export default async function Page(){ const session=await getSession(); const allowed=isOwnerIdentity(session?.userId, session?.robloxUser?.sub); if(!allowed) return <Shell><div className="eas-card p-10 text-center"><h1 className="text-3xl font-black">Admin Locked</h1><p className="text-zinc-400 mt-2">You are not allowed to view this admin page.</p></div></Shell>; return <Shell><div className="mb-6"><p className="text-xs font-bold uppercase tracking-[.25em] text-violet-300">Admin</p><h1 className="text-4xl font-black">Moderation</h1></div><div className="eas-card p-8"><h2 className="text-2xl font-black">Moderation Console</h2><p className="mt-3 text-zinc-400">This page uses the new all-access admin layout. Hook your existing API actions here while keeping owner checks active.</p><div className="mt-5 flex flex-wrap gap-3"><Link className="eas-btn eas-btn-primary" href="/admin">Back to Admin Home</Link><Link className="eas-btn" href="/leaderboard">View Public Leaderboard</Link></div></div></Shell> }
