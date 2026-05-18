@@ -34,14 +34,14 @@ export function RankPill({ cr = 0 }: { cr?: number }) {
 
 export function StatCard({ label, value, sub, icon }: { label: string; value: React.ReactNode; sub?: string; icon?: string }) {
   return (
-    <div className="eas-card eas-stat">
+    <div className="eas-card eas-stat" style={{ transition: "transform 0.22s cubic-bezier(0.4,0,0.2,1), box-shadow 0.22s cubic-bezier(0.4,0,0.2,1)" }}>
       <div style={{ display: "flex", justifyContent: "space-between", gap: 16 }}>
         <div>
           <div className="eas-stat-label">{label}</div>
-          <div className="eas-stat-value">{value}</div>
+          <div className="eas-stat-value" style={{ transition: "color 0.18s cubic-bezier(0.4,0,0.2,1)" }}>{value}</div>
           {sub && <div className="eas-stat-sub">{sub}</div>}
         </div>
-        <div className="eas-logo" style={{ width: 48, height: 48, borderRadius: 16, fontSize: 21 }}>{icon || "✦"}</div>
+        <div className="eas-logo" style={{ width: 48, height: 48, borderRadius: 16, fontSize: 21, transition: "transform 0.22s cubic-bezier(0.4,0,0.2,1)" }}>{icon || "✦"}</div>
       </div>
     </div>
   );
@@ -115,7 +115,7 @@ export function ProgressCard({ cr = 0 }: { cr?: number }) {
         <RankPill cr={cr} />
       </div>
       <div style={{ marginTop: 22, height: 12, borderRadius: 999, background: "rgba(255,255,255,.10)", overflow: "hidden" }}>
-        <div style={{ height: "100%", width: `${pct}%`, borderRadius: 999, background: "linear-gradient(90deg, var(--purple), var(--blue), var(--gold))" }} />
+        <div className="eas-progress-bar" style={{ height: "100%", width: `${pct}%`, borderRadius: 999, background: "linear-gradient(90deg, var(--purple), var(--blue), var(--gold))", transition: "width 0.6s cubic-bezier(0.4,0,0.2,1)" }} />
       </div>
       <p className="eas-player-sub" style={{ marginTop: 10 }}>{next ? `${Math.max(0, next.min - Number(cr || 0)).toLocaleString()} CR to ${next.name}` : "Highest tier reached"}</p>
     </div>

@@ -12,7 +12,7 @@ function GuideSection({
 }) {
   return (
     <div
-      className="eas-card"
+      className="eas-card eas-guide-section"
       style={{ display: "flex", flexDirection: "column", gap: 14 }}
     >
       <div style={{ display: "flex", alignItems: "center", gap: 12 }}>

@@ -67,7 +67,7 @@ export default function Shell({
               const active = path === href || (href !== "/" && path.startsWith(href));
               return (
                 <Link key={href} href={href} onClick={() => setOpen(false)} className={`eas-nav-link ${active ? "active" : ""}`}>
-                  <span className="eas-nav-ico">{icon}</span>
+                  <span className="eas-nav-ico" style={{ transition: "transform 0.18s cubic-bezier(0.4,0,0.2,1)", display: "inline-block" }}>{icon}</span>
                   <span>{label}</span>
                 </Link>
               );
@@ -83,7 +83,7 @@ export default function Shell({
                 const active = path === href || path.startsWith(href + "/");
                 return (
                   <Link key={href} href={href} onClick={() => setOpen(false)} className={`eas-nav-link ${active ? "active" : ""}`}>
-                    <span className="eas-nav-ico">{icon}</span>
+                    <span className="eas-nav-ico" style={{ transition: "transform 0.18s cubic-bezier(0.4,0,0.2,1)", display: "inline-block" }}>{icon}</span>
                     <span>{label}</span>
                   </Link>
                 );
@@ -95,15 +95,17 @@ export default function Shell({
         <div className="eas-sidebar-bottom">
           {user ? (
             <div className="eas-card" style={{ padding: 14 }}>
-              <div className="eas-player-cell">
-                <div className="eas-avatar">
-                  {discordAvatar(user) ? <img src={discordAvatar(user)!} alt="" /> : (user.global_name || user.username || "?").slice(0, 1)}
+              <Link href={`/profile/${user.id}`} style={{ textDecoration: "none", color: "inherit" }}>
+                <div className="eas-player-cell" style={{ transition: "opacity 0.18s cubic-bezier(0.4,0,0.2,1)" }}>
+                  <div className="eas-avatar" style={{ transition: "box-shadow 0.18s cubic-bezier(0.4,0,0.2,1), transform 0.18s cubic-bezier(0.4,0,0.2,1)" }}>
+                    {discordAvatar(user) ? <img src={discordAvatar(user)!} alt="" /> : (user.global_name || user.username || "?").slice(0, 1)}
+                  </div>
+                  <div style={{ minWidth: 0 }}>
+                    <div className="eas-player-name">{user.global_name || user.username}</div>
+                    <div className="eas-player-sub">Discord linked</div>
+                  </div>
                 </div>
-                <div style={{ minWidth: 0 }}>
-                  <div className="eas-player-name">{user.global_name || user.username}</div>
-                  <div className="eas-player-sub">Discord linked</div>
-                </div>
-              </div>
+              </Link>
               {robloxUser ? (
                 <div className="eas-rank-pill" style={{ marginTop: 12 }}>Roblox: {robloxUser.preferred_username || robloxUser.name || robloxUser.sub}</div>
               ) : (
@@ -116,7 +118,7 @@ export default function Shell({
         </div>
       </aside>
 
-      {open && <button aria-label="Close menu" onClick={() => setOpen(false)} style={{ position: "fixed", inset: 0, zIndex: 30, background: "rgba(0,0,0,.72)", border: 0 }} />}
+      {open && <button aria-label="Close menu" onClick={() => setOpen(false)} style={{ position: "fixed", inset: 0, zIndex: 30, background: "rgba(0,0,0,.72)", border: 0, cursor: "default", animation: "fadeIn 0.2s cubic-bezier(0.4,0,0.2,1)" }} />}
 
       <div className="eas-main">
         <header className="eas-topbar">

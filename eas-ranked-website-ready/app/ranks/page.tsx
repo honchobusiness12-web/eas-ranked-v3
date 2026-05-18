@@ -132,6 +132,7 @@ function RankCard({ tier, index }: { tier: (typeof RANK_TIERS)[0]; index: number
 
   return (
     <div
+      className="eas-rank-card"
       style={{
         background: `linear-gradient(135deg, rgba(15,23,42,.88), rgba(2,6,23,.80))`,
         border: `1px solid ${tier.border}`,

@@ -14,6 +14,7 @@ export default function LeaderboardPage() {
   const [q, setQ] = useState("");
   const [rank, setRank] = useState("all");
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [page, setPage] = useState(1);
 
   useEffect(() => {
@@ -68,7 +69,15 @@ export default function LeaderboardPage() {
             {loading ? "Loading..." : `${filtered.length} player${filtered.length !== 1 ? "s" : ""} shown`}
           </p>
         </div>
-        <button onClick={() => location.reload()} className="eas-btn">↻ Refresh</button>
+        <button
+          onClick={() => { setRefreshing(true); location.reload(); }}
+          className={`eas-btn${refreshing ? " eas-btn-loading" : ""}`}
+          disabled={refreshing}
+          aria-label="Refresh leaderboard"
+        >
+          <span style={{ display: "inline-block", transition: "transform 0.4s cubic-bezier(0.4,0,0.2,1)", transform: refreshing ? "rotate(360deg)" : "rotate(0deg)" }}>↻</span>
+          {refreshing ? " Refreshing..." : " Refresh"}
+        </button>
       </div>
 
       <div className="eas-toolbar">
