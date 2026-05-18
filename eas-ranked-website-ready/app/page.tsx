@@ -23,7 +23,7 @@ export default function HomePage() {
           <div className="eas-kicker">Welcome to</div>
           <h1 className="eas-title">EAS <span>RANKED</span></h1>
           <p className="eas-subtitle">
-            The official ranked hub for Elevate All-Stars TimeBomb Duels. Track CR, rankings,
+            Competitive ranked league dashboard for Elevate All-Stars. Track CR, rankings,
             placements, profiles, seasons, and league progress in one clean dashboard.
           </p>
           <div className="eas-actions">
